@@ -1,0 +1,96 @@
+<html>
+<head> 
+	<title>texit </title> </head>
+<body>
+<script>
+
+
+var chars = [
+				[
+					"abcçdefgğhıijklmnoöpqrsştuüvwxyz",
+					"ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ"
+				],
+				[
+					"0123456789", 
+					[
+						".,:;()@!\"", 
+						"$#%&'*+-/<=>?[\]^_`{|}~"
+					]
+				]
+			];
+
+
+function array2char(o){
+	var t = "";
+	if(o instanceof Array)
+		for(var i = 0; i < o.length; i++) t += array2char(o[i]);
+	else t += o; 	
+	return t;
+}			
+
+var active_texit = chars;
+var active_char = "";
+
+function div_active_texit(){
+	if(active_texit.length == 2) return active_texit;
+	
+	var middle_i = Math.floor(active_texit.length / 2);
+	var a1 = [];
+	var a2 = [];
+	for(var i = 0; i < active_texit.length; i++) {
+		if(i < middle_i) a1.push(active_texit[i]);
+		else             a2.push(active_texit[i]);
+	}
+	return [a1, a2];
+}
+
+function texit(i){
+	var c;
+	if(i == 0 || i == 1){
+		active_texit = div_active_texit()[i];
+		c = array2char(active_texit);
+		if(c.length == 1){
+			active_char = c;
+			active_texit = chars;
+		}
+		render();
+	}
+}
+
+function render(){
+	var texits = div_active_texit();
+	document.getElementById("possible_group_0").innerHTML = array2char(texits[0]);
+	document.getElementById("possible_group_1").innerHTML = array2char(texits[1]);
+	if(active_char != ""){
+		document.getElementById("possible_text").innerHTML += active_char;
+		active_char = "";
+	}
+}
+
+function reset(){
+	if(array2char(active_texit) == array2char(chars)) { 
+		var t = document.getElementById("possible_text").innerText;
+		document.getElementById("possible_text").innerHTML = t.replace(/.$/,'');
+	}
+	active_texit = chars;
+	render();
+}
+
+</script>
+
+<div style="float:left;width: 244px;">
+	<button style="float:left;"  onclick="texit(0)">&lt</button>
+	<button style="float:right;" onclick="reset()">-</button>
+	<button style="float:right;" onclick="texit(1)">&gt</button>
+	<br style="clear:both">
+	<div id="possible_group_0" onclick="texit(0)" style="position:relative; width:100px; height:100px; border: 1px solid #000; word-wrap: break-word; padding: 5px;float:left"></div>
+	<div id="possible_group_1" onclick="texit(1)" style="position:relative; width:100px; height:100px; border: 1px solid #000; word-wrap: break-word; padding: 5px;float:left"></div>
+	<div id="possible_text"    onclick="reset()" style="position:relative; width:202px; height:100px; border: 1px solid #000; word-wrap: break-word; padding: 10px;clear:both"></div>
+	<div id="debug"></div>
+</div>
+
+<script>
+	render();
+</script>
+</body>
+</html>
