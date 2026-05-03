@@ -1,35 +1,47 @@
 # textit
 
-`texit` is an experimental and interactive text writing tool that allows you to create characters through a hierarchical selection process (by narrowing down character groups) instead of typing them directly.
+`textit` is an experimental and interactive text navigation tool that reimagines how we input characters. Instead of traditional typing, it uses a hierarchical decision tree logic where users "navigate" to their desired characters by narrowing down character sets through a series of binary selections.
 
-## About the Project
+## 🚀 The Concept
 
-Unlike traditional keyboard input, this project offers a character selection mechanism based on decision tree logic. Users reach their final characters by splitting large character sets into smaller groups and selecting a group at each step. This method provides a "character navigation" experience rather than standard keyboard usage.
+Unlike a standard keyboard where each key represents a single character, `textit` treats the entire alphabet (and more) as a searchable map. By splitting character groups in half at each step, you can reach any character through a path of decisions. It’s not just a writing tool; it's a character discovery experience.
 
-## Key Features
+## ✨ Key Features
 
-- **Hierarchical Character Selection:** Character sets are split into two at each step into more specific subsets.
-- **Interactive User Experience:** A click-based, visual selection process.
-- **Wide Character Range:** Supports the Latin alphabet (lowercase/uppercase), numbers, and various special symbols.
-- **Dynamic Refresh:** Character groups are updated instantly as selections are made, and the selected character is added to the main text area.
-- **Reset Mechanism:** The ability to return the selection process to the very beginning with a single touch.
+- **Hierarchical Navigation:** Seamlessly narrow down character sets into smaller, more specific subsets.
+- **Interactive Visual Feedback:** Dynamic UI that updates instantly as you make selections.
+- **Modern & Responsive UI:** A centered, clean interface optimized for both desktop and mobile (touch-friendly).
+- **Keyboard & Mouse Control:** 
+  - Use **Left/Right Arrows** (or click the boxes) to select groups.
+  - Use **Up Arrow** to go back one step in the tree or delete the last character.
+  - Use **Down Arrow** to autocomplete suggested words or add a space.
+- **Intelligent Word Suggestions:** Real-time suggestions from a built-in dictionary that can be completed with a single keypress.
+- **Animated Guidance:** An interactive "textit" header that simulates the actual key combinations required to type the project name, serving as a live tutorial.
 
-## How It Works?
+## 🛠 How It Works
 
-The system holds characters in nested arrays. The workflow consists of the following steps:
+1. **Start:** The app begins with the full set of characters (Letters, Numbers, Symbols).
+2. **Binary Splitting:** The current set is split into two visual boxes.
+3. **Selection:** Choose the box containing your desired character.
+4. **Completion:** Once a group is narrowed down to a single character, it's automatically added to your text and the tree resets to the root.
+5. **Smart Shortcuts:**
+   - **Back/Undo:** Press `▲` (Up Arrow) to climb back up the decision tree if you make a wrong turn.
+   - **Autocomplete:** Press `▼` (Down Arrow) when a suggested word appears (in gray) to complete it instantly.
+   - **Full Reset:** Press the Down Arrow 6 times rapidly to clear the entire text and restart the introduction animation.
 
-1. **Start:** The application begins with the widest character set.
-2. **Splitting:** Users use the `<` or `>` buttons or click on the character groups on the screen to split the current character set in half.
-3. **Deepening:** Each selection directs the user to a smaller and more specific character group.
-4. **Character Completion:** If a selection results in only one character remaining, this character is automatically added to the "text area" (`possible_text`) and the system returns to the initial state for the next character.
-5. **Reset:** The selection process can be completely reset via the `-` button or by clicking on the text area.
+## 💻 Technical Details
 
-## Technical Details
+- **Stack:** Pure HTML5, CSS3, and Vanilla JavaScript. Zero dependencies.
+- **Data Structure:** Nested arrays forming a binary search tree of characters.
+- **Pathfinding Algorithm:** Includes a built-in `getPath()` function that dynamically calculates the binary path (L/R) for any given character in the hierarchy.
+- **System Verification:** Includes a `runSystemTest()` function in the console to verify that every supported character can be reached correctly through the navigation logic.
 
-- **Tech Stack:** Pure HTML5 and JavaScript (Vanilla JS). No external library dependencies.
-- **Algorithm:** Uses dynamic array splitting logic via the `div_active_texit` function to split character groups.
-- **Structure:** The data structure consists of nested arrays where characters are hierarchically grouped.
+## 🚦 Installation and Usage
 
-## Installation and Usage
+No installation or build process is required.
+1. Clone the repository: `git clone https://github.com/yuempek/textit.git`
+2. Open `index.html` in any modern web browser.
+3. Start navigating your way through the alphabet!
 
-No installation is required. You can start using the application immediately by opening the `index.html` file in any modern web browser.
+---
+*Created with ❤️ as an exploration of non-traditional human-computer interaction.*
