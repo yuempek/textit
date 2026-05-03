@@ -13,6 +13,8 @@
             --accent-color: #007bff;
             --hover-bg: #e9ecef;
             --suggestion-color: #adb5bd;
+            --key-gray: #dee2e6;
+            --key-active: #007bff;
         }
 
         body {
@@ -30,32 +32,79 @@
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
         }
 
-        .controls-top {
+        /* Başlık ve Klavye Dizilimi */
+        .header-container {
             display: flex;
+            align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 40px;
         }
 
-        .controls-bottom {
+        .keyboard-layout {
+            display: grid;
+            grid-template-areas: 
+                ". up ."
+                "left down right";
+            gap: 4px;
+        }
+
+        .key-icon {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--key-gray);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: var(--suggestion-color);
+            background: white;
+            transition: all 0.1s;
+        }
+
+        .key-up { grid-area: up; }
+        .key-left { grid-area: left; }
+        .key-down { grid-area: down; }
+        .key-right { grid-area: right; }
+
+        .key-icon.active {
+            background-color: var(--key-active);
+            color: white;
+            border-color: var(--key-active);
+            transform: scale(0.9);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #title-display {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 0;
+            min-width: 150px;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .controls-top, .controls-bottom {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
 
         .square-btn {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
             cursor: pointer;
             background-color: var(--container-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -70,27 +119,27 @@
 
         .selection-boxes {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .box {
             flex: 1;
-            min-height: 120px;
+            min-height: 140px;
             border: 2px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 16px;
             background-color: var(--container-bg);
-            padding: 15px;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+            font-size: 16px;
             word-break: break-all;
             cursor: pointer;
             transition: border-color 0.2s;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .box:hover {
@@ -101,13 +150,13 @@
             position: relative;
             background-color: var(--container-bg);
             border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 100px;
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 120px;
             text-align: left;
-            font-size: 20px;
+            font-size: 22px;
             word-wrap: break-word;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
             display: flex;
             align-items: flex-start;
             flex-wrap: wrap;
@@ -127,8 +176,8 @@
 
         .cursor {
             display: inline-block;
-            width: 2px;
-            height: 24px;
+            width: 3px;
+            height: 28px;
             background-color: var(--accent-color);
             margin-left: 2px;
             animation: blink 1s infinite;
@@ -140,34 +189,44 @@
             50% { opacity: 0; }
         }
 
-        .instruction {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #6c757d;
+        .char-pop {
+            animation: pop 0.3s ease-out;
+            display: inline-block;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1.5); color: var(--accent-color); }
+            100% { transform: scale(1); color: inherit; }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="header-container">
+            <div class="keyboard-layout">
+                <div id="key-up" class="key-icon key-up">▲</div>
+                <div id="key-left" class="key-icon key-left">◀</div>
+                <div id="key-down" class="key-icon key-down">▼</div>
+                <div id="key-right" class="key-icon key-right">▶</div>
+            </div>
+            <h1 id="title-display"></h1>
+        </div>
+
         <div class="controls-top">
-            <button class="square-btn" onclick="goBack()">▲</button>
+            <button class="square-btn" id="btn-up" onclick="handleInput('ArrowUp')">▲</button>
         </div>
 
         <div class="selection-boxes">
-            <div id="possible_group_0" class="box" onclick="texit(0)"></div>
-            <div id="possible_group_1" class="box" onclick="texit(1)"></div>
+            <div id="possible_group_0" class="box" onclick="handleInput('ArrowLeft')"></div>
+            <div id="possible_group_1" class="box" onclick="handleInput('ArrowRight')"></div>
         </div>
 
         <div class="controls-bottom">
-            <button class="square-btn" onclick="applySuggestion()">▼</button>
+            <button class="square-btn" id="btn-down" onclick="handleInput('ArrowDown')">▼</button>
         </div>
 
         <div class="text-area-container" onclick="reset()">
             <span id="possible_text"></span><span id="suggestion_text"></span><span class="cursor"></span>
-        </div>
-
-        <div class="instruction">
-            Yön tuşları: Sol/Sağ (Seçim), Yukarı (Geri/Sil), Aşağı (Öneri/Boşluk)
         </div>
     </div>
 
@@ -188,9 +247,68 @@
             ]
         ];
 
+        // "textit" yazım yolu (Sol: 0, Sağ: 1)
+        // t: 0, 1, 0, 0, 0, 1
+        // e: 0, 0, 0, 1, 0, 0
+        // x: 0, 0, 1, 0, 1, 1
+        // i: 0, 0, 0, 1, 0, 1
+        // t: 0, 1, 0, 0, 0, 1
+        const typingSequence = {
+            't': [0, 1, 0, 0, 0, 1],
+            'e': [0, 0, 0, 1, 0, 0],
+            'x': [0, 0, 1, 0, 1, 1],
+            'i': [0, 0, 0, 1, 0, 1]
+        };
+
         let active_texit = initialChars;
         let history_stack = [];
         let current_text = "";
+        let down_arrow_count = 0;
+        let isTypingAnimation = true;
+
+        const titleEl = document.getElementById('title-display');
+        const mainTitle = "textit";
+
+        async function animateKeyVisual(keyIdx) {
+            const keyName = keyIdx === 0 ? 'key-left' : 'key-right';
+            const el = document.getElementById(keyName);
+            el.classList.add('active');
+            await new Promise(r => setTimeout(r, 150));
+            el.classList.remove('active');
+        }
+
+        async function animateTitle() {
+            if (!isTypingAnimation) return;
+            titleEl.textContent = "";
+            
+            for(let char of mainTitle) {
+                if (!isTypingAnimation) break;
+                
+                // Harf için tuş kombinasyonunu simüle et
+                const seq = typingSequence[char] || typingSequence['t'];
+                for(let step of seq) {
+                    if (!isTypingAnimation) break;
+                    await animateKeyVisual(step);
+                    await new Promise(r => setTimeout(r, 50));
+                }
+                
+                titleEl.textContent += char;
+                await new Promise(r => setTimeout(r, 400));
+            }
+            
+            if (isTypingAnimation) {
+                await new Promise(r => setTimeout(r, 2000));
+                for(let i=mainTitle.length; i>=0; i--) {
+                    if (!isTypingAnimation) break;
+                    titleEl.textContent = mainTitle.slice(0, i);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+                await new Promise(r => setTimeout(r, 500));
+                animateTitle();
+            }
+        }
+
+        animateTitle();
 
         function array2char(o) {
             let t = "";
@@ -204,7 +322,6 @@
 
         function div_active_texit() {
             if (active_texit.length === 2) return active_texit;
-            
             const middle_i = Math.floor(active_texit.length / 2);
             let a1 = [];
             let a2 = [];
@@ -215,20 +332,82 @@
             return [a1, a2];
         }
 
+        function handleInput(key) {
+            animateInputKey(key);
+            if (key !== 'ArrowDown') down_arrow_count = 0;
+
+            switch(key) {
+                case 'ArrowLeft': texit(0); break;
+                case 'ArrowRight': texit(1); break;
+                case 'ArrowUp': goBack(); break;
+                case 'ArrowDown': handleDownKey(); break;
+            }
+        }
+
+        function animateInputKey(key) {
+            const id = 'key-' + key.replace('Arrow', '').toLowerCase();
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('active');
+                setTimeout(() => el.classList.remove('active'), 150);
+            }
+        }
+
         function texit(i) {
             const groups = div_active_texit();
-            if (i === 0 || i === 1) {
-                history_stack.push(active_texit);
-                active_texit = groups[i];
-                const content = array2char(active_texit);
-                
-                if (content.length === 1) {
-                    current_text += content;
-                    active_texit = initialChars;
-                    history_stack = [];
-                }
-                render();
+            history_stack.push(active_texit);
+            active_texit = groups[i];
+            const content = array2char(active_texit);
+            
+            if (content.length === 1) {
+                addCharToTitle(content);
+                current_text += content;
+                active_texit = initialChars;
+                history_stack = [];
             }
+            render();
+        }
+
+        function addCharToTitle(char) {
+            if (isTypingAnimation) {
+                isTypingAnimation = false;
+                titleEl.textContent = "";
+            }
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.className = 'char-pop';
+            titleEl.appendChild(span);
+        }
+
+        function handleDownKey() {
+            down_arrow_count++;
+            if (down_arrow_count >= 6) {
+                fullReset();
+                return;
+            }
+
+            const suggestion = getSuggestion();
+            if (suggestion) {
+                const parts = suggestion.split('');
+                parts.forEach(c => addCharToTitle(c));
+                addCharToTitle(' ');
+                current_text += suggestion + " ";
+                reset();
+            } else if (history_stack.length === 0) {
+                addCharToTitle(' ');
+                current_text += " ";
+                reset();
+            }
+            render();
+        }
+
+        function fullReset() {
+            current_text = "";
+            titleEl.innerHTML = "";
+            isTypingAnimation = true;
+            down_arrow_count = 0;
+            reset();
+            animateTitle();
         }
 
         function reset() {
@@ -242,6 +421,11 @@
                 active_texit = history_stack.pop();
             } else if (current_text.length > 0) {
                 current_text = current_text.slice(0, -1);
+                if (titleEl.lastChild) titleEl.removeChild(titleEl.lastChild);
+                if (titleEl.childNodes.length === 0) {
+                    isTypingAnimation = true;
+                    animateTitle();
+                }
             }
             render();
         }
@@ -249,27 +433,9 @@
         function getSuggestion() {
             const words = current_text.split(/\s+/);
             const lastWord = words[words.length - 1].toLowerCase();
-            
             if (lastWord.length === 0) return "";
-            
             const match = dictionary.find(word => word.startsWith(lastWord));
-            if (match && match !== lastWord) {
-                return match.slice(lastWord.length);
-            }
-            return "";
-        }
-
-        function applySuggestion() {
-            const suggestion = getSuggestion();
-            if (suggestion) {
-                current_text += suggestion + " ";
-                reset();
-            } else if (history_stack.length === 0) {
-                // Root'taysa ve öneri yoksa boşluk ekle
-                current_text += " ";
-                reset();
-            }
-            render();
+            return (match && match !== lastWord) ? match.slice(lastWord.length) : "";
         }
 
         function render() {
@@ -281,19 +447,9 @@
         }
 
         window.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case 'ArrowLeft':
-                    texit(0);
-                    break;
-                case 'ArrowRight':
-                    texit(1);
-                    break;
-                case 'ArrowUp':
-                    goBack();
-                    break;
-                case 'ArrowDown':
-                    applySuggestion();
-                    break;
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                e.preventDefault();
+                handleInput(e.key);
             }
         });
 
