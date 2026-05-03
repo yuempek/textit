@@ -39,7 +39,8 @@
             text-align: center;
         }
 
-        /* Başlık ve Klavye Dizilimi */
+        /* Header and Keyboard Layout Styles */
+
         .header-container {
             display: flex;
             align-items: center;
@@ -259,6 +260,8 @@
     </div>
 
     <script>
+        // Sample dictionary for word suggestions
+
         const dictionary = ["merhaba", "nasılsın", "teşekkürler", "lütfen", "günaydın", "iyi", "akşamlar", "evet", "hayır", "tamam", "belki", "görüşürüz", "selam", "deneme", "kelime", "yazmak", "harika", "süper", "test"];
 
         const initialChars = [
@@ -275,6 +278,7 @@
             ]
         ];
 
+        // Application state variables
         let active_texit = initialChars;
         let history_stack = [];
         let current_text = "";
@@ -282,6 +286,11 @@
 
 
         function array2char(o) {
+            /**
+             * Recursively flattens an array structure into a string of characters.
+             * @param {Array|string} o The data structure to convert.
+             * @returns {string} Flattened string of all characters.
+             */
             let t = "";
             if (Array.isArray(o)) {
                 for (let i = 0; i < o.length; i++) t += array2char(o[i]);
@@ -304,6 +313,10 @@
         }
 
         function handleInput(key) {
+            /**
+            * Handles keyboard or button input.
+            * @param {string} key Directional key (ArrowLeft, ArrowRight, ArrowUp, ArrowDown)
+            */
             switch (key) {
                 case 'ArrowLeft': texit(0); break;
                 case 'ArrowRight': texit(1); break;
@@ -313,6 +326,10 @@
         }
 
         function texit(i) {
+            /**
+             * Processes a selection (left or right) in the character tree.
+             * @param {number} i Index of selection (0 for left, 1 for right)
+             */
             const groups = div_active_texit();
             history_stack.push(active_texit);
             active_texit = groups[i];
@@ -327,6 +344,9 @@
         }
 
         function goBack() {
+            /**
+             * Navigates back one step in the decision tree or deletes the last character.
+             */
             if (history_stack.length > 0) {
                 active_texit = history_stack.pop();
             } else if (current_text.length > 0) {
@@ -336,6 +356,9 @@
         }
 
         function handleDownKey() {
+            /**
+             * Handles the Down arrow key for word suggestions or adding spaces.
+             */
             const suggestion = getSuggestion();
             if (suggestion) {
                 const parts = suggestion.split('');
@@ -349,12 +372,19 @@
         }
 
         function reset() {
+            /**
+             * Resets the current selection tree to the root.
+             */
             active_texit = initialChars;
             history_stack = [];
             render();
         }
 
         function getSuggestion() {
+            /**
+             * Searches the dictionary for the best match based on the last typed word.
+             * @returns {string} The suggested completion.
+             */
             const words = current_text.split(/\s+/);
             const lastWord = words[words.length - 1].toLowerCase();
             if (lastWord.length === 0) return "";
@@ -363,6 +393,9 @@
         }
 
         function render() {
+            /**
+             * Updates the DOM elements with current character groups and text.
+             */
             const texits = div_active_texit();
             document.getElementById("possible_group_0").textContent = array2char(texits[0]);
             document.getElementById("possible_group_1").textContent = array2char(texits[1]);
@@ -379,10 +412,17 @@
 
         render();
 
-        // SECTION (TITLE and animation) {
+        // --- SECTION (TITLE and animation) --- 
+
         const mainTitle = "textit";
 
         function getPath(targetChar, group = initialChars) {
+            /**
+             * Finds the binary-tree path (0s and 1s) for a given character.
+             * @param {string} targetChar The character to search for.
+             * @param {Array} group The character group to search within.
+             * @returns {Array|null} Array of 0/1 steps or null if not found.
+             */
             const content = array2char(group);
             if (!content.includes(targetChar)) return null;
             if (content.length === 1) return [];
@@ -406,8 +446,9 @@
             return null;
         }
 
-        // Typing sequence dinamik olarak oluşturuluyor
+        // Dynamically build the typing sequence for the main title
         const typingSequence = {};
+
         mainTitle.split('').forEach(char => {
             if (!typingSequence[char]) {
                 typingSequence[char] = getPath(char);
@@ -428,7 +469,8 @@
             titleEl.textContent = "";
 
             for (let char of mainTitle) {
-                // Harf için tuş kombinasyonunu simüle et
+                // Simulate key combinations for each character
+
                 const seq = typingSequence[char];
                 for (let step of seq) {
                     const keyName = step === 0 ? 'key-left' : 'key-right';
@@ -458,12 +500,18 @@
 
 
 
-        // SECTION(TEST CODE){
+        // --- SECTION (TEST CODE) ---
+        /**
+         * Automated system test that verifies if every character in the set
+         * can be correctly reached through the navigation logic.
+         */
+
         function runSystemTest() {
             const allChars = "abcçdefgğhıijklmnoöpqrsştuüvwxyzABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ0123456789.,:;()@!\"$#%&'*+-/<=>?[\]^_`{|}~";
             const charArray = allChars.split("");
 
-            // Mevcut metni temizle
+            // Clear current state before testing
+
             current_text = "";
             active_texit = initialChars;
             history_stack = [];
@@ -490,8 +538,9 @@
             }
         }
 
-        // Testi konsoldan çalıştırmak için: runSystemTest()
-        //}
+        // To run the test from console: runSystemTest()
+        // --- END SECTION ---
+
 
     </script>
 </body>
