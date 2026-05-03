@@ -36,25 +36,34 @@
             text-align: center;
         }
 
-        .controls {
+        .controls-top {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             margin-bottom: 20px;
-            gap: 10px;
         }
 
-        button {
-            padding: 12px 24px;
-            font-size: 18px;
+        .controls-bottom {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .square-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
             cursor: pointer;
             background-color: var(--container-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: all 0.2s;
-            flex: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        button:active {
+        .square-btn:active {
             background-color: var(--hover-bg);
             transform: translateY(2px);
         }
@@ -62,7 +71,7 @@
         .selection-boxes {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .box {
@@ -99,6 +108,9 @@
             font-size: 20px;
             word-wrap: break-word;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
         }
 
         #possible_text {
@@ -109,8 +121,23 @@
 
         #suggestion_text {
             color: var(--suggestion-color);
-            position: absolute;
+            position: relative;
             z-index: 1;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 24px;
+            background-color: var(--accent-color);
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         .instruction {
@@ -122,10 +149,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="controls">
-            <button onclick="texit(0)">&lt;</button>
-            <button onclick="reset()">-</button>
-            <button onclick="texit(1)">&gt;</button>
+        <div class="controls-top">
+            <button class="square-btn" onclick="goBack()">▲</button>
         </div>
 
         <div class="selection-boxes">
@@ -133,12 +158,16 @@
             <div id="possible_group_1" class="box" onclick="texit(1)"></div>
         </div>
 
+        <div class="controls-bottom">
+            <button class="square-btn" onclick="applySuggestion()">▼</button>
+        </div>
+
         <div class="text-area-container" onclick="reset()">
-            <span id="possible_text"></span><span id="suggestion_text"></span>
+            <span id="possible_text"></span><span id="suggestion_text"></span><span class="cursor"></span>
         </div>
 
         <div class="instruction">
-            Yön tuşları: Sol/Sağ (Seçim), Yukarı (Geri/Sil), Aşağı (Öneri Ekle)
+            Yön tuşları: Sol/Sağ (Seçim), Yukarı (Geri/Sil), Aşağı (Öneri/Boşluk)
         </div>
     </div>
 
@@ -235,7 +264,12 @@
             if (suggestion) {
                 current_text += suggestion + " ";
                 reset();
+            } else if (history_stack.length === 0) {
+                // Root'taysa ve öneri yoksa boşluk ekle
+                current_text += " ";
+                reset();
             }
+            render();
         }
 
         function render() {
