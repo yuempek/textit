@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -49,7 +50,7 @@
 
         .keyboard-layout {
             display: grid;
-            grid-template-areas: 
+            grid-template-areas:
                 ". up ."
                 "left down right";
             gap: 4px;
@@ -69,17 +70,28 @@
             transition: all 0.1s;
         }
 
-        .key-up { grid-area: up; }
-        .key-left { grid-area: left; }
-        .key-down { grid-area: down; }
-        .key-right { grid-area: right; }
+        .key-up {
+            grid-area: up;
+        }
+
+        .key-left {
+            grid-area: left;
+        }
+
+        .key-down {
+            grid-area: down;
+        }
+
+        .key-right {
+            grid-area: right;
+        }
 
         .key-icon.active {
             background-color: var(--key-active);
             color: white;
             border-color: var(--key-active);
             transform: scale(0.9);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         #title-display {
@@ -91,7 +103,8 @@
             font-family: 'Courier New', Courier, monospace;
         }
 
-        .controls-top, .controls-bottom {
+        .controls-top,
+        .controls-bottom {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
@@ -109,7 +122,7 @@
             justify-content: center;
             align-items: center;
             transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .square-btn:active {
@@ -139,7 +152,7 @@
             cursor: pointer;
             transition: border-color 0.2s;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .box:hover {
@@ -156,7 +169,7 @@
             text-align: left;
             font-size: 22px;
             word-wrap: break-word;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: flex-start;
             flex-wrap: wrap;
@@ -185,8 +198,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
         }
 
         .char-pop {
@@ -195,11 +215,19 @@
         }
 
         @keyframes pop {
-            0% { transform: scale(1.5); color: var(--accent-color); }
-            100% { transform: scale(1); color: inherit; }
+            0% {
+                transform: scale(1.5);
+                color: var(--accent-color);
+            }
+
+            100% {
+                transform: scale(1);
+                color: inherit;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header-container">
@@ -239,76 +267,19 @@
                 "ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ"
             ],
             [
-                "0123456789", 
+                "0123456789",
                 [
-                    ".,:;()@!\"", 
+                    ".,:;()@!\"",
                     "$#%&'*+-/<=>?[\]^_`{|}~"
                 ]
             ]
         ];
 
-        // "textit" yazım yolu (Sol: 0, Sağ: 1)
-        // t: 0, 1, 0, 0, 0, 1
-        // e: 0, 0, 0, 1, 0, 0
-        // x: 0, 0, 1, 0, 1, 1
-        // i: 0, 0, 0, 1, 0, 1
-        // t: 0, 1, 0, 0, 0, 1
-        const typingSequence = {
-            't': [0, 1, 0, 0, 0, 1],
-            'e': [0, 0, 0, 1, 0, 0],
-            'x': [0, 0, 1, 0, 1, 1],
-            'i': [0, 0, 0, 1, 0, 1]
-        };
-
         let active_texit = initialChars;
         let history_stack = [];
         let current_text = "";
-        let down_arrow_count = 0;
-        let isTypingAnimation = true;
 
-        const titleEl = document.getElementById('title-display');
-        const mainTitle = "textit";
 
-        async function animateKeyVisual(keyIdx) {
-            const keyName = keyIdx === 0 ? 'key-left' : 'key-right';
-            const el = document.getElementById(keyName);
-            el.classList.add('active');
-            await new Promise(r => setTimeout(r, 150));
-            el.classList.remove('active');
-        }
-
-        async function animateTitle() {
-            if (!isTypingAnimation) return;
-            titleEl.textContent = "";
-            
-            for(let char of mainTitle) {
-                if (!isTypingAnimation) break;
-                
-                // Harf için tuş kombinasyonunu simüle et
-                const seq = typingSequence[char] || typingSequence['t'];
-                for(let step of seq) {
-                    if (!isTypingAnimation) break;
-                    await animateKeyVisual(step);
-                    await new Promise(r => setTimeout(r, 50));
-                }
-                
-                titleEl.textContent += char;
-                await new Promise(r => setTimeout(r, 400));
-            }
-            
-            if (isTypingAnimation) {
-                await new Promise(r => setTimeout(r, 2000));
-                for(let i=mainTitle.length; i>=0; i--) {
-                    if (!isTypingAnimation) break;
-                    titleEl.textContent = mainTitle.slice(0, i);
-                    await new Promise(r => setTimeout(r, 100));
-                }
-                await new Promise(r => setTimeout(r, 500));
-                animateTitle();
-            }
-        }
-
-        animateTitle();
 
         function array2char(o) {
             let t = "";
@@ -333,23 +304,11 @@
         }
 
         function handleInput(key) {
-            animateInputKey(key);
-            if (key !== 'ArrowDown') down_arrow_count = 0;
-
-            switch(key) {
+            switch (key) {
                 case 'ArrowLeft': texit(0); break;
                 case 'ArrowRight': texit(1); break;
                 case 'ArrowUp': goBack(); break;
                 case 'ArrowDown': handleDownKey(); break;
-            }
-        }
-
-        function animateInputKey(key) {
-            const id = 'key-' + key.replace('Arrow', '').toLowerCase();
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('active');
-                setTimeout(() => el.classList.remove('active'), 150);
             }
         }
 
@@ -358,61 +317,12 @@
             history_stack.push(active_texit);
             active_texit = groups[i];
             const content = array2char(active_texit);
-            
+
             if (content.length === 1) {
-                addCharToTitle(content);
                 current_text += content;
                 active_texit = initialChars;
                 history_stack = [];
             }
-            render();
-        }
-
-        function addCharToTitle(char) {
-            if (isTypingAnimation) {
-                isTypingAnimation = false;
-                titleEl.textContent = "";
-            }
-            const span = document.createElement('span');
-            span.textContent = char;
-            span.className = 'char-pop';
-            titleEl.appendChild(span);
-        }
-
-        function handleDownKey() {
-            down_arrow_count++;
-            if (down_arrow_count >= 6) {
-                fullReset();
-                return;
-            }
-
-            const suggestion = getSuggestion();
-            if (suggestion) {
-                const parts = suggestion.split('');
-                parts.forEach(c => addCharToTitle(c));
-                addCharToTitle(' ');
-                current_text += suggestion + " ";
-                reset();
-            } else if (history_stack.length === 0) {
-                addCharToTitle(' ');
-                current_text += " ";
-                reset();
-            }
-            render();
-        }
-
-        function fullReset() {
-            current_text = "";
-            titleEl.innerHTML = "";
-            isTypingAnimation = true;
-            down_arrow_count = 0;
-            reset();
-            animateTitle();
-        }
-
-        function reset() {
-            active_texit = initialChars;
-            history_stack = [];
             render();
         }
 
@@ -421,12 +331,26 @@
                 active_texit = history_stack.pop();
             } else if (current_text.length > 0) {
                 current_text = current_text.slice(0, -1);
-                if (titleEl.lastChild) titleEl.removeChild(titleEl.lastChild);
-                if (titleEl.childNodes.length === 0) {
-                    isTypingAnimation = true;
-                    animateTitle();
-                }
             }
+            render();
+        }
+
+        function handleDownKey() {
+            const suggestion = getSuggestion();
+            if (suggestion) {
+                const parts = suggestion.split('');
+                current_text += suggestion + " ";
+                reset();
+            } else if (history_stack.length === 0) {
+                current_text += " ";
+                reset();
+            }
+            render();
+        }
+
+        function reset() {
+            active_texit = initialChars;
+            history_stack = [];
             render();
         }
 
@@ -454,6 +378,87 @@
         });
 
         render();
+
+
+
+
+        // SECTION (TITLE and animation) {
+        const mainTitle = "textit";
+
+        function getPath(targetChar, group = initialChars) {
+            const content = array2char(group);
+            if (!content.includes(targetChar)) return null;
+            if (content.length === 1) return [];
+
+            let leftGroup, rightGroup;
+            if (group.length === 2) {
+                leftGroup = group[0];
+                rightGroup = group[1];
+            } else {
+                const middle = Math.floor(group.length / 2);
+                leftGroup = group.slice(0, middle);
+                rightGroup = group.slice(middle);
+            }
+
+            const leftPath = getPath(targetChar, leftGroup);
+            if (leftPath !== null) return [0, ...leftPath];
+
+            const rightPath = getPath(targetChar, rightGroup);
+            if (rightPath !== null) return [1, ...rightPath];
+
+            return null;
+        }
+
+        // Typing sequence dinamik olarak oluşturuluyor
+        const typingSequence = {};
+        mainTitle.split('').forEach(char => {
+            if (!typingSequence[char]) {
+                typingSequence[char] = getPath(char);
+            }
+        });
+
+
+        const titleEl = document.getElementById('title-display');
+
+        async function animateKeyVisual(keyName) {
+            const el = document.getElementById(keyName);
+            el.classList.add('active');
+            await new Promise(r => setTimeout(r, 150));
+            el.classList.remove('active');
+        }
+
+        async function animateTitle() {
+            titleEl.textContent = "";
+
+            for (let char of mainTitle) {
+                // Harf için tuş kombinasyonunu simüle et
+                const seq = typingSequence[char];
+                for (let step of seq) {
+                    const keyName = step === 0 ? 'key-left' : 'key-right';
+                    await animateKeyVisual(keyName);
+                    await new Promise(r => setTimeout(r, 50));
+                }
+
+                titleEl.textContent += char;
+                await new Promise(r => setTimeout(r, 400));
+            }
+
+            await new Promise(r => setTimeout(r, 2000));
+
+            for (let i = mainTitle.length; i >= 0; i--) {
+                titleEl.textContent = mainTitle.slice(0, i);
+                await animateKeyVisual("key-up");
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            await new Promise(r => setTimeout(r, 500));
+            animateTitle();
+        }
+
+        animateTitle();
+
+        //}
     </script>
 </body>
+
 </html>
