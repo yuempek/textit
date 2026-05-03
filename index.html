@@ -1,96 +1,269 @@
-<html>
-<head> 
-	<title>texit </title> </head>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>texit</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --accent-color: #007bff;
+            --hover-bg: #e9ecef;
+            --suggestion-color: #adb5bd;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            touch-action: manipulation;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        button:active {
+            background-color: var(--hover-bg);
+            transform: translateY(2px);
+        }
+
+        .selection-boxes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            flex: 1;
+            min-height: 120px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--container-bg);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            word-break: break-all;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .box:hover {
+            border-color: var(--accent-color);
+        }
+
+        .text-area-container {
+            position: relative;
+            background-color: var(--container-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 100px;
+            text-align: left;
+            font-size: 20px;
+            word-wrap: break-word;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        #possible_text {
+            white-space: pre-wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        #suggestion_text {
+            color: var(--suggestion-color);
+            position: absolute;
+            z-index: 1;
+        }
+
+        .instruction {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
 <body>
-<script>
+    <div class="container">
+        <div class="controls">
+            <button onclick="texit(0)">&lt;</button>
+            <button onclick="reset()">-</button>
+            <button onclick="texit(1)">&gt;</button>
+        </div>
 
+        <div class="selection-boxes">
+            <div id="possible_group_0" class="box" onclick="texit(0)"></div>
+            <div id="possible_group_1" class="box" onclick="texit(1)"></div>
+        </div>
 
-var chars = [
-				[
-					"abcçdefgğhıijklmnoöpqrsştuüvwxyz",
-					"ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ"
-				],
-				[
-					"0123456789", 
-					[
-						".,:;()@!\"", 
-						"$#%&'*+-/<=>?[\]^_`{|}~"
-					]
-				]
-			];
+        <div class="text-area-container" onclick="reset()">
+            <span id="possible_text"></span><span id="suggestion_text"></span>
+        </div>
 
+        <div class="instruction">
+            Yön tuşları: Sol/Sağ (Seçim), Yukarı (Geri/Sil), Aşağı (Öneri Ekle)
+        </div>
+    </div>
 
-function array2char(o){
-	var t = "";
-	if(o instanceof Array)
-		for(var i = 0; i < o.length; i++) t += array2char(o[i]);
-	else t += o; 	
-	return t;
-}			
+    <script>
+        const dictionary = ["merhaba", "nasılsın", "teşekkürler", "lütfen", "günaydın", "iyi", "akşamlar", "evet", "hayır", "tamam", "belki", "görüşürüz", "selam", "deneme", "kelime", "yazmak", "harika", "süper", "test"];
 
-var active_texit = chars;
-var active_char = "";
+        const initialChars = [
+            [
+                "abcçdefgğhıijklmnoöpqrsştuüvwxyz",
+                "ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ"
+            ],
+            [
+                "0123456789", 
+                [
+                    ".,:;()@!\"", 
+                    "$#%&'*+-/<=>?[\]^_`{|}~"
+                ]
+            ]
+        ];
 
-function div_active_texit(){
-	if(active_texit.length == 2) return active_texit;
-	
-	var middle_i = Math.floor(active_texit.length / 2);
-	var a1 = [];
-	var a2 = [];
-	for(var i = 0; i < active_texit.length; i++) {
-		if(i < middle_i) a1.push(active_texit[i]);
-		else             a2.push(active_texit[i]);
-	}
-	return [a1, a2];
-}
+        let active_texit = initialChars;
+        let history_stack = [];
+        let current_text = "";
 
-function texit(i){
-	var c;
-	if(i == 0 || i == 1){
-		active_texit = div_active_texit()[i];
-		c = array2char(active_texit);
-		if(c.length == 1){
-			active_char = c;
-			active_texit = chars;
-		}
-		render();
-	}
-}
+        function array2char(o) {
+            let t = "";
+            if (Array.isArray(o)) {
+                for (let i = 0; i < o.length; i++) t += array2char(o[i]);
+            } else {
+                t += o;
+            }
+            return t;
+        }
 
-function render(){
-	var texits = div_active_texit();
-	document.getElementById("possible_group_0").innerHTML = array2char(texits[0]);
-	document.getElementById("possible_group_1").innerHTML = array2char(texits[1]);
-	if(active_char != ""){
-		document.getElementById("possible_text").innerHTML += active_char;
-		active_char = "";
-	}
-}
+        function div_active_texit() {
+            if (active_texit.length === 2) return active_texit;
+            
+            const middle_i = Math.floor(active_texit.length / 2);
+            let a1 = [];
+            let a2 = [];
+            for (let i = 0; i < active_texit.length; i++) {
+                if (i < middle_i) a1.push(active_texit[i]);
+                else a2.push(active_texit[i]);
+            }
+            return [a1, a2];
+        }
 
-function reset(){
-	if(array2char(active_texit) == array2char(chars)) { 
-		var t = document.getElementById("possible_text").innerText;
-		document.getElementById("possible_text").innerHTML = t.replace(/.$/,'');
-	}
-	active_texit = chars;
-	render();
-}
+        function texit(i) {
+            const groups = div_active_texit();
+            if (i === 0 || i === 1) {
+                history_stack.push(active_texit);
+                active_texit = groups[i];
+                const content = array2char(active_texit);
+                
+                if (content.length === 1) {
+                    current_text += content;
+                    active_texit = initialChars;
+                    history_stack = [];
+                }
+                render();
+            }
+        }
 
-</script>
+        function reset() {
+            active_texit = initialChars;
+            history_stack = [];
+            render();
+        }
 
-<div style="float:left;width: 244px;">
-	<button style="float:left;"  onclick="texit(0)">&lt</button>
-	<button style="float:right;" onclick="reset()">-</button>
-	<button style="float:right;" onclick="texit(1)">&gt</button>
-	<br style="clear:both">
-	<div id="possible_group_0" onclick="texit(0)" style="position:relative; width:100px; height:100px; border: 1px solid #000; word-wrap: break-word; padding: 5px;float:left"></div>
-	<div id="possible_group_1" onclick="texit(1)" style="position:relative; width:100px; height:100px; border: 1px solid #000; word-wrap: break-word; padding: 5px;float:left"></div>
-	<div id="possible_text"    onclick="reset()" style="position:relative; width:202px; height:100px; border: 1px solid #000; word-wrap: break-word; padding: 10px;clear:both"></div>
-	<div id="debug"></div>
-</div>
+        function goBack() {
+            if (history_stack.length > 0) {
+                active_texit = history_stack.pop();
+            } else if (current_text.length > 0) {
+                current_text = current_text.slice(0, -1);
+            }
+            render();
+        }
 
-<script>
-	render();
-</script>
+        function getSuggestion() {
+            const words = current_text.split(/\s+/);
+            const lastWord = words[words.length - 1].toLowerCase();
+            
+            if (lastWord.length === 0) return "";
+            
+            const match = dictionary.find(word => word.startsWith(lastWord));
+            if (match && match !== lastWord) {
+                return match.slice(lastWord.length);
+            }
+            return "";
+        }
+
+        function applySuggestion() {
+            const suggestion = getSuggestion();
+            if (suggestion) {
+                current_text += suggestion + " ";
+                reset();
+            }
+        }
+
+        function render() {
+            const texits = div_active_texit();
+            document.getElementById("possible_group_0").textContent = array2char(texits[0]);
+            document.getElementById("possible_group_1").textContent = array2char(texits[1]);
+            document.getElementById("possible_text").textContent = current_text;
+            document.getElementById("suggestion_text").textContent = getSuggestion();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    texit(0);
+                    break;
+                case 'ArrowRight':
+                    texit(1);
+                    break;
+                case 'ArrowUp':
+                    goBack();
+                    break;
+                case 'ArrowDown':
+                    applySuggestion();
+                    break;
+            }
+        });
+
+        render();
+    </script>
 </body>
 </html>
