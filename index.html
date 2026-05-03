@@ -379,9 +379,6 @@
 
         render();
 
-
-
-
         // SECTION (TITLE and animation) {
         const mainTitle = "textit";
 
@@ -458,6 +455,44 @@
         animateTitle();
 
         //}
+
+
+
+        // SECTION(TEST CODE){
+        function runSystemTest() {
+            const allChars = "abcçdefgğhıijklmnoöpqrsştuüvwxyzABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZ0123456789.,:;()@!\"$#%&'*+-/<=>?[\]^_`{|}~";
+            const charArray = allChars.split("");
+
+            // Mevcut metni temizle
+            current_text = "";
+            active_texit = initialChars;
+            history_stack = [];
+
+            console.log("Sistem testi başlatılıyor...");
+
+            charArray.forEach(char => {
+                const path = getPath(char);
+                if (path) {
+                    path.forEach(step => texit(step));
+                } else {
+                    console.error(`Hata: '${char}' karakteri için yol bulunamadı!`);
+                }
+            });
+
+            render();
+
+            if (current_text === allChars) {
+                console.log("✅ Test Başarılı: Tüm karakterler doğru şekilde eşleşti.");
+            } else {
+                console.error("❌ Test Başarısız: Karakter eşleşme hatası!");
+                console.log("Beklenen:", allChars);
+                console.log("Alınan:", current_text);
+            }
+        }
+
+        // Testi konsoldan çalıştırmak için: runSystemTest()
+        //}
+
     </script>
 </body>
 
