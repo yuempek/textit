@@ -38,8 +38,7 @@ Unlike a standard keyboard where each key represents a single character, `textit
 
 ## Installation and Usage
 
-No installation or build process is required.
-1. Clone the repository: `git clone https://github.com/yuempek/textit.git`
-2. Open `index.html` in any modern web browser.
-3. Start navigating your way through the alphabet!
+No installation. [Use here](https://yuempek.github.io/textit/)
+
+
 
